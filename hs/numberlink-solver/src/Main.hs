@@ -15,29 +15,37 @@ type Pos = (Int, Int)
 data Cell = Cell {
     cState :: CellState
   , cType  :: CellType
-} deriving Show
+} deriving (Eq,Show)
 
-data CellState = Empty | Number Int deriving Show
+data CellState = Empty | Number Int deriving (Eq,Show)
 
-data CellType = Fixed | NonFixed deriving Show
+data CellType = Start | Goal | Normal deriving (Eq,Show)
 
 type Field = M.Map Pos Cell
 
 mkEmptyCell :: Cell
-mkEmptyCell = Cell Empty NonFixed
+mkEmptyCell = Cell Empty Normal
 
-mkFixedCell :: Int -> Cell
-mkFixedCell n = Cell (Number n) Fixed
+mkStartCell :: Int -> Cell
+mkStartCell n = Cell (Number n) Start
+
+mkGoalCell :: Int -> Cell
+mkGoalCell n = Cell (Number n) Goal
 
 mkField :: [String] -> Field
-mkField input = M.fromList $ map convert $ zip [0..] (concat input)
+mkField input = convert (zip [0..] $ concat input) M.empty
   where
-    convert :: (Int, Char) -> (Pos, Cell)
-    convert (id, c) 
-      | c == '.'  = (pos, mkEmptyCell)
-      | otherwise = (pos, mkFixedCell $ read [c])
+    convert :: [(Int, Char)] -> Field -> Field
+    convert [] field = field
+    convert ((id, c):ts) field 
+      | c == '.'  = convert ts $ M.insert pos mkEmptyCell field
+      | otherwise = convert ts $ if hasValue value 
+                                   then M.insert pos (mkStartCell value) field
+                                   else M.insert pos (mkGoalCell  value) field
       where
         pos = (id `div` m, id `mod` n)
+        value = read [c] :: Int
+        hasValue n = mkStartCell n `elem` M.elems field
 
     n = length $ head input
     m = length input
