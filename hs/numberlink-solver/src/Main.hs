@@ -78,18 +78,31 @@ solve :: CurrentState -> [CurrentState]
 solve (n, pos, field) 
   | isCompleted field = return (-1, (-1,-1), field)
   | n == -1 = []
-  | otherwise = [ state 
-                | state <- next n pos field
-                , not $ isVerbose state
+  | otherwise = [ nextState 
+                | nextState@(_,_,nextField) <- next n pos field
+                , not $ isVerbose nextState
+                , not $ hasOrphan nextField pos 
                 ] >>= solve
                             
 isVerbose :: CurrentState -> Bool
 isVerbose (n, p, field) = 2 <= length sameNumberCells
   where sameNumberCells = filter (\(Just (Cell s _)) -> getNumber s == n)
-                        $ map (flip M.lookup field) 
+                        $ map (`M.lookup` field) 
                         $ filter (not . isGoalN n field) 
                         $ filter (inField field) 
                         $ nextPos p
+
+hasOrphan :: Field -> Pos -> Bool
+hasOrphan field p = any ((<= 1) . availableCount field)
+                        $ filter (isEmpty field) 
+                        $ filter (inField field) 
+                        $ nextPos p
+
+availableCount :: Field -> Pos ->Int
+availableCount field p = length
+                       $ filter (not . isUsed field) 
+                       $ filter (inField field) 
+                       $ nextPos p
 
 isCompleted :: Field -> Bool
 isCompleted field = all (not . isEmpty field) $ M.keys field
@@ -134,6 +147,11 @@ inField field (x,y) = 0 <= x && x < n && 0 <= y && y < m
 isEmpty :: Field -> Pos -> Bool
 isEmpty field p = case M.lookup p field of
                     Just (Cell Empty _) -> True
+                    _ -> False
+
+isUsed :: Field -> Pos -> Bool
+isUsed field p = case M.lookup p field of
+                    Just (Cell (Number _) Normal) -> True
                     _ -> False
 
 isStart :: Field -> Pos -> Bool
