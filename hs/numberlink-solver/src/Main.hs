@@ -1,18 +1,8 @@
 module Main where
 
-import Data.List (maximumBy)
-import Data.Function (on)
+import System.Environment (getArgs)
 import qualified Data.Map as M
 
-problem :: [String]
-problem = 
-  [ "...2"
-  , ".1.."
-  , "..2."
-  , "1..."
-  ]
-
--- data Point = Point Int Int deriving (Eq, Show)
 type Pos = (Int, Int)
 data Cell = Cell {
     cState :: CellState
@@ -70,9 +60,14 @@ mkField input = convert (zip [0..] $ concat input) M.empty
 
 main :: IO ()
 main = do
-    let field = mkField problem
-        answer = head $ solve $ findStart 1 field
-    print answer
+    args <- getArgs
+    case args of
+      [] -> print "pass filename of problem"
+      [filename] -> do
+        p <- readFile filename
+        let field = mkField $ lines p
+            (_,_,f) = head $ solve $ findStart 1 field
+        putStr $ showField f
 
 solve :: CurrentState -> [CurrentState]
 solve (n, pos, field) 
@@ -123,18 +118,11 @@ nextStart n field = if n == maxNum
   where
     maxNum = maximum $ map (getNumber . cState) $ M.elems field
 
-
 findStart :: Int -> Field -> CurrentState
 findStart n field = let pos = head $ M.keys $ M.filter (isStartN n) field
                     in  (n, pos, field)
   where
     isStartN n (Cell cellState cellType) = cellState == Number n && cellType == Start
-
-getValue :: Pos -> Field -> Int
-getValue p field = case M.lookup p field of
-                     Nothing -> 0
-                     Just (Cell Empty _) -> 0
-                     Just (Cell (Number n) _) -> n
 
 fieldSize :: Field -> Pos
 fieldSize field = let (n,m) = last $ M.keys field
