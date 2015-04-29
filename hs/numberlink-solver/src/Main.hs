@@ -25,6 +25,8 @@ data CellType = Start | Goal | Normal deriving (Eq,Show)
 
 type Field = M.Map Pos Cell
 
+type CurrentState = (Int, Pos, Field)
+
 showField :: Field -> String
 showField field = chunk $ concatMap (show . getNumber . cState) $ M.elems field
   where (_,m) = fieldSize field
@@ -72,33 +74,46 @@ main = do
         answer = head $ solve $ findStart 1 field
     print answer
 
-solve :: (Pos, Field) -> [(Pos, Field)]
-solve (pos, field) 
-  | isCompleted field = return ((-1,-1), field)
-  | otherwise = [(p,fld) | (p, fld) <- next pos field] >>= solve
+solve :: CurrentState -> [CurrentState]
+solve (n, pos, field) 
+  | isCompleted field = return (-1, (-1,-1), field)
+  | n == -1 = []
+  | otherwise = [ state 
+                | state <- next n pos field
+                , not $ isVerbose state
+                ] >>= solve
+                            
+isVerbose :: CurrentState -> Bool
+isVerbose (n, p, field) = 2 <= length sameNumberCells
+  where sameNumberCells = filter (\(Just (Cell s _)) -> getNumber s == n)
+                        $ map (flip M.lookup field) 
+                        $ filter (not . isGoalN n field) 
+                        $ filter (inField field) 
+                        $ nextPos p
 
 isCompleted :: Field -> Bool
 isCompleted field = all (not . isEmpty field) $ M.keys field
 
-next :: Pos -> Field -> [(Pos, Field)]
-next p field = case M.lookup p field of
-                 Just (Cell (Number n) Goal) -> nextStart n field
-                 _ -> map update (validNextPos p field)
+next :: Int -> Pos -> Field -> [CurrentState]
+next n p field = case M.lookup p field of
+                 Just (Cell (Number _) Goal) -> nextStart n field
+                 _ -> map update (validNextPos n p field)
   where
-    value = getValue p field
-    update pos = (pos, M.update (\_ -> Just $ mkCell value) pos field)
+    update pos = (n, pos, M.update func pos field)
+    func (Cell Empty _) = Just $ mkCell n
+    func (Cell (Number m) Goal) = Just $ mkGoalCell m
 
-nextStart :: Int -> Field -> [(Pos, Field)]
+nextStart :: Int -> Field -> [CurrentState]
 nextStart n field = if n == maxNum
-                      then [((-1,-1),field)]
+                      then [(-1, (-1,-1),field)]
                       else [findStart (n+1) field]
   where
     maxNum = maximum $ map (getNumber . cState) $ M.elems field
 
 
-findStart :: Int -> Field -> (Pos, Field)
+findStart :: Int -> Field -> CurrentState
 findStart n field = let pos = head $ M.keys $ M.filter (isStartN n) field
-                    in  (pos, field)
+                    in  (n, pos, field)
   where
     isStartN n (Cell cellState cellType) = cellState == Number n && cellType == Start
 
@@ -134,5 +149,5 @@ isGoalN n field p = case M.lookup p field of
 nextPos :: Pos -> [Pos]
 nextPos (x,y) = [(x+1,y),(x,y-1),(x-1,y),(x,y+1)]
 
-validNextPos :: Pos -> Field -> [Pos]
-validNextPos p field = filter (\pos -> isEmpty field pos || not (isStart field pos)) $ filter (inField field) $ nextPos p
+validNextPos :: Int -> Pos -> Field -> [Pos]
+validNextPos n p field = filter (\pos -> isEmpty field pos || isGoalN n field pos) $ filter (inField field) $ nextPos p
