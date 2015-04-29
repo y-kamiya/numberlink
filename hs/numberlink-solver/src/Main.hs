@@ -2,6 +2,7 @@ module Main where
 
 import System.Environment (getArgs)
 import qualified Data.Map as M
+import Control.Monad.Writer
 
 type Pos = (Int, Int)
 data Cell = Cell {
@@ -66,18 +67,22 @@ main = do
       [filename] -> do
         p <- readFile filename
         let field = mkField $ lines p
-            (_,_,f) = head $ solve $ findStart 1 field
+            w  = head $ solve $ writer (findStart 1 field, 0)
+            ((_,_,f), log) = runWriter w
+        print log
         putStr $ showField f
 
-solve :: CurrentState -> [CurrentState]
-solve (n, pos, field) 
-  | isCompleted field = return (-1, (-1,-1), field)
-  | n == -1 = []
+solve :: Writer Int CurrentState -> [Writer Int CurrentState]
+solve w
+  | isCompleted field = [listen (-1, (-1,-1), field)]
+  | n == -1 = tell 1 >> []
   | otherwise = [ nextState 
                 | nextState@(_,_,nextField) <- next n pos field
                 , not $ isVerbose nextState
                 , not $ hasOrphan nextField pos 
                 ] >>= solve
+  where
+    ((n, pos, field), _) = runWriter w
                             
 isVerbose :: CurrentState -> Bool
 isVerbose (n, p, field) = 2 <= length sameNumberCells
