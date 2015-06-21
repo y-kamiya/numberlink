@@ -1,0 +1,10 @@
+#field table {
+    border-collapse: collapse;
+}
+
+#field table td {
+    width: 30px;
+    height: 30px;
+    border: 2px #808080 solid;
+    text-align: center;
+}
