@@ -8,3 +8,7 @@
     border: 2px #808080 solid;
     text-align: center;
 }
+
+#field input[type=number] {
+    width: 30px;
+}
