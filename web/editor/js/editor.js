@@ -35,12 +35,12 @@ var save = function () {
             if (value == "") {
                 text += ".";
             } else {
-                console.log(value);
                 text += String.fromCharCode(Number(value) + 96);
             }
         }
+        text += "<br>"
     }
-    console.log(text);
+    $('#output').append(text);
 }
 
 $('#createTableButton').on('click', createTable);
