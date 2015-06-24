@@ -13,6 +13,6 @@
     width: 30px;
 }
 
-button.disabled {
+.disabled {
     display: none;
 }
