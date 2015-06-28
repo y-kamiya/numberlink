@@ -1,3 +1,7 @@
+body {
+    text-align: center;
+}
+
 div.fieldSize {
     margin-bottom: 20px;
 }
@@ -8,11 +12,13 @@ div.fieldSize input {
 
 #field table {
     border-collapse: collapse;
+    margin: auto;
 }
 
 #field > table td {
-    width: 30px;
-    height: 30px;
+    width: 50px;
+    height: 50px;
+    font-size: 16pt;
     border: 2px #808080 solid;
     padding: 0px;
     text-align: center;
@@ -23,8 +29,8 @@ div.fieldSize input {
 }
 
 #field table.innerTable td {
-    width: 15px;
-    height: 15px;
+    width: 25px;
+    height: 25px;
     border-style: none;
 }
 
@@ -50,6 +56,10 @@ div.fieldSize input {
 
 #field input[type=number] {
     width: 30px;
+}
+
+#save, #solve {
+    margin: 10px;
 }
 
 .disabled {

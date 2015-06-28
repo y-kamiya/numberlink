@@ -4,6 +4,12 @@ $(function () {
     var ID_IS_NONE = -1;
     var KEYCODE = {LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40};
 
+    $(function() {
+        $('#createTableButton').on('click', createTable);
+        $('#save').on('click', save);
+        $('#solve').on('click', initEditor);
+    });
+
     var createTable = function() {
         var table = $('<table>'),
             rowNum = $('#rowNum').val(),
@@ -20,26 +26,18 @@ $(function () {
             table.append(tr);
         }
         $('#field').append(table);
-        $(this).addClass('disabled');
 
-        $('#save').removeClass('disabled');
-        $('#save').on('click', save);
-
-        $('#solve').removeClass('disabled');
-        $('#solve').on('click', initEditor);
+        $('#buttons div').eq(0).addClass('disabled');
+        $('#buttons div').eq(1).removeClass('disabled');
     }
 
     var initEditor = function() {
         save();
         $('#field table').remove();
+        $('#input').addClass('disabled');
+        $('#save').addClass('disabled');
+        $('#solve').addClass('disabled');
         load();
-    }
-
-    var changeButtonToSave = function () {
-        $(this).text('Save');
-        $(this).attr('id', 'saveButton');
-        $(this).off('click');
-        $(this).on('click', save);
     }
 
     var save = function () {
@@ -60,12 +58,8 @@ $(function () {
             text += "<br>"
         }
         $('#input').append(text);
-        // $('#load').removeClass('disabled');
-        // $('#load').on('click', load);
     }
 
-    $('#createTableButton').on('click', createTable);
-    // $('#createTableButton').on('click', changeButtonToSave);
 
     var load = function() {
         var table = $('<table>'),

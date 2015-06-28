@@ -18,11 +18,19 @@
         <p>Decide row and column number</p>
         row: <input type="number" id="rowNum" value="5">
         colomn: <input type="number" id="colNum" value="5">
-        <button id='createTableButton'>Create Field</button>
     </div>
     <div id="field"></div>
-    <button id="save" class="disabled">save</button>
-    <button id="solve" class="disabled">solve</button>
+    <div id="buttons">
+        <div>
+            <button id='createTableButton' class="btn btn-lg btn-primary">Create Field</button>
+        </div>
+        <div class="disabled">
+            <button id="save" class="btn btn-lg btn-primary">save</button>
+            <button id="solve" class="btn btn-lg btn-primary">solve</button>
+        </div>
+        <div class="disabled">
+            <button id='createTableButton' class="btn btn-lg btn-primary">arrows</button>
+        </div>
 
     <div>
         <div id="input"></div>
