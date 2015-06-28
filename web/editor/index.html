@@ -4,15 +4,19 @@
     <script src="js/input.js" type="text/javascript"></script>
 </head>
 <body>
-    <h1>editor</h1>
-    <div id="field"></div>
-
-    <div>
-        <input type="number" id="rowNum" value="5">rowNum
-        <input type="number" id="colNum" value="5">colNum
+    <h1>Number Link Editor</h1>
+    <div class="fieldSize">
+        <p>Decide row and column number</p>
+        row: <input type="number" id="rowNum" value="5">
+        colomn: <input type="number" id="colNum" value="5">
         <button id='createTableButton'>Create Field</button>
     </div>
-    <div id="output"></div>
-    <button id="load" class="disabled">load</button>
+    <div id="field"></div>
+    <button id="save" class="disabled">save</button>
+    <button id="solve" class="disabled">solve</button>
+
+    <div>
+        <div id="input"></div>
+    </div>
 </body>
 
