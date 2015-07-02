@@ -35,9 +35,23 @@ $(function () {
         save();
         $('#field table').remove();
         $('#input').addClass('disabled');
-        $('#save').addClass('disabled');
-        $('#solve').addClass('disabled');
+        $('#buttons div').eq(1).addClass('disabled');
+        $('#buttons div').eq(2).removeClass('disabled');
+        initCursor();
         load();
+    }
+
+    var initCursor = function() {
+        var handler = function(code) {
+            return function() {
+                var e = jQuery.Event('keydown', { keyCode: code });
+                $(this).trigger(e);
+            };
+        };
+        $('#cursor-up').on('click', handler(KEYCODE.UP));
+        $('#cursor-left').on('click', handler(KEYCODE.LEFT));
+        $('#cursor-right').on('click', handler(KEYCODE.RIGHT));
+        $('#cursor-down').on('click', handler(KEYCODE.DOWN));
     }
 
     var save = function () {

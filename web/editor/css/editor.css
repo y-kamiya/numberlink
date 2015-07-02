@@ -62,6 +62,15 @@ div.fieldSize input {
     margin: 10px;
 }
 
+#buttons: {
+    margin-top: 20px 
+}
+
+#cursor-left,
+#cursor-right {
+    margin: 0px 30px;
+}
+
 .disabled {
     display: none;
 }
